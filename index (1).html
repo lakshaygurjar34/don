@@ -1,0 +1,74 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be Mine?</title>
+<style>
+body { margin:0; font-family:Poppins,sans-serif; background:pink; text-align:center; padding-top:80px; overflow:hidden; }
+button { padding:15px 25px; font-size:20px; border:none; border-radius:12px; cursor:pointer; margin:10px; }
+#yesBtn { background:red; color:white; }
+#noBtn { background:black; color:white; position:absolute; }
+canvas { position:fixed; top:0; left:0; pointer-events:none; width:100%; height:100%; }
+</style>
+</head>
+<body>
+
+<h1>💖 Will You Be Mine Forever? 💖</h1>
+<button id="yesBtn">YES 🥺💝</button>
+<button id="noBtn">NO 😭</button>
+<canvas id="fireworks"></canvas>
+
+<script>
+// NO button runs away
+const noBtn = document.getElementById("noBtn");
+function moveNo(mx,my){
+  const rect=noBtn.getBoundingClientRect();
+  const dist=Math.hypot(mx-(rect.x+rect.width/2),my-(rect.y+rect.height/2));
+  if(dist<120){ noBtn.style.left=Math.random()*window.innerWidth+"px"; noBtn.style.top=Math.random()*window.innerHeight+"px"; }
+}
+document.addEventListener("mousemove",e=>moveNo(e.clientX,e.clientY));
+document.addEventListener("touchmove",e=>{ let t=e.touches[0]; moveNo(t.clientX,t.clientY); });
+
+// YES button fireworks + redirect
+const yesBtn = document.getElementById("yesBtn");
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+yesBtn.addEventListener("click", startSequence);
+yesBtn.addEventListener("touchstart", startSequence);
+
+function startSequence(){
+    canvas.style.display="block";
+    startFireworks();
+    setTimeout(()=> window.location.href="yes.html", 2000);
+}
+
+let particles=[];
+function startFireworks(){
+    setInterval(()=>{
+        createFirework(Math.random()*canvas.width, Math.random()*canvas.height);
+    },200);
+    animate();
+}
+
+function createFirework(x,y){
+    for(let i=0;i<80;i++){
+        particles.push({x,y,angle:Math.random()*2*Math.PI,speed:Math.random()*4+1,size:Math.random()*3+1,life:60});
+    }
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+        p.x+=Math.cos(p.angle)*p.speed; p.y+=Math.sin(p.angle)*p.speed; p.life--;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,2*Math.PI); ctx.fillStyle="rgba(255,0,0,"+p.life/60+")"; ctx.fill();
+        if(p.life<=0) particles.splice(i,1);
+    });
+    requestAnimationFrame(animate);
+}
+</script>
+</body>
+</html>
